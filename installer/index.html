@@ -49,11 +49,14 @@
 
 <!--
   The ESP Web Tools install button is loaded from the pinned fork submodule at
-  installer/vendor/esp-web-tools. The dist/ directory is built by the deploy
-  workflow (npm ci + npm run build) before GitHub Pages publishes this page.
-  It is not present in the repo at commit time.
+  installer/vendor/esp-web-tools. The deploy workflow builds the vendored
+  library (npm ci + bash script/build) and copies dist/web/* to
+  _site/vendor/dist/, so this src resolves on the deployed GitHub Pages site.
+  For local (non-deployed) serving, run
+    bash installer/vendor/esp-web-tools/script/build
+  and mirror the output to installer/vendor/dist/. Do not commit dist/.
 -->
-<script type="module" src="./vendor/esp-web-tools/dist/web/install-button.js"></script>
+<script type="module" src="./vendor/dist/install-button.js"></script>
 
 </body>
 </html>
