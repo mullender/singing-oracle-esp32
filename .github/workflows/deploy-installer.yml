@@ -1,0 +1,86 @@
+# Simplified from mullender/aliro-doorlock-esp32 deploy-installer.yml.
+# No firmware release fetching yet; the site publishes installer/manifest.json
+# as-is (currently a placeholder with builds=[]).
+
+name: deploy-installer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "installer/**"
+      - ".github/workflows/deploy-installer.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Do not cancel in-flight Pages deploys; the second event waits for the
+# first to finish rather than half-publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Checkout main with submodules
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          # `recursive` pulls installer/vendor/esp-web-tools and any of
+          # its own submodules.
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: installer/vendor/esp-web-tools/package-lock.json
+
+      - name: Build vendored esp-web-tools
+        working-directory: installer/vendor/esp-web-tools
+        run: |
+          npm ci --loglevel=error --no-progress
+          bash script/build
+
+      - name: Prepare _site skeleton
+        run: |
+          set -euo pipefail
+          mkdir -p _site _site/js _site/vendor _site/vendor/dist
+
+          cp installer/index.html _site/index.html
+          cp installer/manifest.json _site/manifest.json
+
+          # Built esp-web-tools output from the fork.
+          cp -r installer/vendor/esp-web-tools/dist/web/* _site/vendor/dist/
+
+          # .nojekyll is important — the file names include hashes with
+          # leading underscores that Jekyll would filter out silently.
+          touch _site/.nojekyll
+
+      - name: Dump _site contents for the run log
+        run: |
+          echo "==== _site tree ===="
+          find _site -maxdepth 3 -print
+          echo "==== manifest.json ===="
+          cat _site/manifest.json || true
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
