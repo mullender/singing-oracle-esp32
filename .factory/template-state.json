@@ -1,0 +1,14 @@
+{
+  "factory_version": "0.4.0.2",
+  "files": {
+    "agents/builder/IDENTITY.md": "a0afd9a8f963841e1655040c51e1bda98f5f7d8cc8d4a5b46e2821ab3e4e36c9",
+    "agents/lead/IDENTITY.md": "71b5dd0f9956742f7a363a1611832f2203d238bde59582eb77578131e3b97f21",
+    "agents/reviewer/IDENTITY.md": "1c83af524bd23f5686e65fe0bda9ec426231aad3e30d8955be7dacad341c751e",
+    "config/OPERATING_RULES.md": "f3623d5ebc05bc12ae184c8122697f18afa740f7f31850e20042e2e683ae0c23",
+    "config/STYLE.md": "c6836bd7633121818f7b9a9172a3c3f26fb039f189f18dd6b1cff9a91d1c1a99",
+    "roles/builder.md": "bb159ed29ec8322b5362b1b09c4ca69bd8a67e5fe546ea371a425decb6b1d5bf",
+    "roles/lead.md": "c118c6042b115ca312067f6a3690b25fd83feb096c78b542a5fd4403091efbdb",
+    "roles/reviewer.md": "04e438bee4c4365e6e498d6858c7bc397b18dbbc61d8938ed9cad10c6939646e"
+  },
+  "format": 1
+}
