@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Singing Oracle — install to M5 AtomS3 (Lite)</title>
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; line-height: 1.55; }
+    main { max-width: 42rem; margin: 2rem auto; padding: 1rem 1.5rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 0.5rem 0; }
+    .install-row { margin: 1.5rem 0; text-align: center; }
+    button[slot="activate"] { font: inherit; font-weight: 700; padding: 0.7rem 1rem; border: 0; border-radius: 4px; cursor: pointer; color: #fff; background: #067a46; }
+    .browser-note { color: #666; font-size: 0.9em; text-align: center; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Singing Oracle — install to M5 AtomS3 (Lite)</h1>
+  <p>
+    The Singing Oracle is a small ESP32 bridge that plays wordless choral
+    melodies on an M5 Unit Synth in response to Home Assistant events. Each
+    family member has a unique leitmotif; events like weather, packages, or
+    the doorbell trigger short pitched phrases played on Choir Aahs
+    (GM patch 53). See <a href="https://github.com/mullender/singing-oracle-esp32">the project repository</a>
+    for design notes and firmware source.
+  </p>
+  <p>
+    Use Chrome or Edge on desktop. Web Serial is required. Safari and
+    Firefox cannot flash the device from the browser.
+  </p>
+
+  <div class="install-row">
+    <esp-web-install-button manifest="./manifest.json">
+      <button slot="activate">Install Singing Oracle</button>
+      <button slot="unsupported">
+        Web Serial is not available in this browser. Use Chrome or Edge on desktop.
+      </button>
+      <button slot="not-allowed">
+        Web Serial requires a secure page (HTTPS or localhost).
+      </button>
+    </esp-web-install-button>
+  </div>
+
+  <p class="browser-note">
+    This page never sends your device data to a remote service.
+  </p>
+</main>
+
+<!--
+  The ESP Web Tools install button is loaded from the pinned fork submodule at
+  installer/vendor/esp-web-tools. The dist/ directory is built by the deploy
+  workflow (npm ci + npm run build) before GitHub Pages publishes this page.
+  It is not present in the repo at commit time.
+-->
+<script type="module" src="./vendor/esp-web-tools/dist/web/install-button.js"></script>
+
+</body>
+</html>
