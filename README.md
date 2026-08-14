@@ -14,11 +14,11 @@ Aliro NFC key. Guests get to smile and ask "wait, did the house just *sing*?"
 
 ## Status
 
-Pre-scaffold. See [`DESIGN.md`](DESIGN.md) for the full design doc — problem
-statement, approaches considered, chosen architecture, distribution plan, and
-next steps. Step 0 is scaffolding the firmware repo and the ESP Web Tools
-installer page (Chrome-only flash-from-URL), mirroring the layout of
-[`aliro-doorlock-esp32`](https://github.com/mullender/aliro-doorlock-esp32).
+Firmware scaffolded. On boot the AtomS3 Lite sends one Choir Aahs middle-C
+to the Unit Synth over UART. The browser installer is live at
+<https://mullender.github.io/singing-oracle-esp32/>. See
+[`DESIGN.md`](DESIGN.md) for the roadmap — MQTT-driven note lists, HA
+melody generation, and per-person themes are next.
 
 ## Hardware
 

@@ -2,15 +2,27 @@
 
 The browser flasher for `singing-oracle-esp32`.
 
-Deployed to GitHub Pages by `.github/workflows/deploy-installer.yml` (see
-that file after the deploy workflow lands).
+## Deployed
+
+Live at **<https://mullender.github.io/singing-oracle-esp32/>**. Open the
+page in Chrome or Edge on desktop, plug in an AtomS3 Lite over USB, and
+click Install. The page erases the chip and flashes a fresh Singing Oracle
+build over Web Serial.
+
+The site is published by `.github/workflows/deploy-installer.yml`. The
+workflow builds the vendored esp-web-tools bundle, runs PlatformIO to
+build the firmware, and copies the four flash images
+(`bootloader.bin`, `partitions.bin`, `boot_app0.bin`, `firmware.bin`)
+plus `manifest.json` and the built esp-web-tools bundle into `_site/`
+before deploying to GitHub Pages.
 
 ## Layout
 
 ```
 installer/
   index.html          the flasher page
-  manifest.json       ESP Web Tools manifest (generated at deploy time)
+  manifest.json       ESP Web Tools multi-part manifest (committed;
+                      edited when the flash layout changes)
   vendor/
     esp-web-tools/    git submodule → mullender/esp-web-tools
 ```
@@ -47,8 +59,6 @@ npm run build
 
 ## What the installer does NOT do
 
-- Firmware distribution. `builds: []` in `manifest.json` is a placeholder.
-  Real builds land through the deploy workflow.
 - Post-flash configuration. WiFi and MQTT credential setup is a follow-up
   and will use the awaited `onPostFlash` callback from the vendored fork.
 - Persistence of setup data. Any values live in memory for the duration of
