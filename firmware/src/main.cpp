@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-// Grove TX on AtomS3 Lite = GPIO 2 (yellow wire; connects to Unit Synth MIDI-IN).
-static const int MIDI_TX_PIN = 2;
+// Grove TX on AtomS3 Lite: TXD2 = G1 per m5stack_atoms3/pins_arduino.h
+static const int MIDI_TX_PIN = 1;
 
 void setup() {
   Serial1.begin(31250, SERIAL_8N1, -1, MIDI_TX_PIN);
