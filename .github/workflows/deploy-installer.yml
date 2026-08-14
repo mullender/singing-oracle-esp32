@@ -1,6 +1,7 @@
 # Simplified from mullender/aliro-doorlock-esp32 deploy-installer.yml.
-# No firmware release fetching yet; the site publishes installer/manifest.json
-# as-is (currently a placeholder with builds=[]).
+# Builds firmware in CI (PlatformIO) and publishes the four flash images
+# (bootloader, partitions, boot_app0, firmware) alongside the installer UI.
+# No GitHub Releases yet; installer/manifest.json ships as-is.
 
 name: deploy-installer
 
@@ -9,6 +10,7 @@ on:
     branches: [main]
     paths:
       - "installer/**"
+      - "firmware/**"
       - ".github/workflows/deploy-installer.yml"
   workflow_dispatch:
 
@@ -51,7 +53,33 @@ jobs:
           npm ci --loglevel=error --no-progress
           bash script/build
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PlatformIO
+        run: pip install --upgrade platformio
+
+      - name: Build firmware
+        working-directory: firmware
+        run: pio run
+
+      - name: Locate boot_app0.bin from framework
+        id: boot_app0
+        run: |
+          set -euo pipefail
+          path="$(find "$HOME/.platformio/packages" -name boot_app0.bin -print -quit)"
+          echo "boot_app0.bin found at: $path"
+          if [ -z "$path" ]; then
+            echo "::error::boot_app0.bin not found under $HOME/.platformio/packages"
+            exit 1
+          fi
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+
       - name: Prepare _site skeleton
+        env:
+          BOOT_APP0: ${{ steps.boot_app0.outputs.path }}
         run: |
           set -euo pipefail
           mkdir -p _site _site/js _site/vendor _site/vendor/dist
@@ -61,6 +89,12 @@ jobs:
 
           # Built esp-web-tools output from the fork.
           cp -r installer/vendor/esp-web-tools/dist/web/* _site/vendor/dist/
+
+          # Flash images from the firmware/ PlatformIO build.
+          cp firmware/.pio/build/atoms3/bootloader.bin _site/bootloader.bin
+          cp firmware/.pio/build/atoms3/partitions.bin _site/partitions.bin
+          cp firmware/.pio/build/atoms3/firmware.bin   _site/firmware.bin
+          cp "$BOOT_APP0" _site/boot_app0.bin
 
           # .nojekyll is important — the file names include hashes with
           # leading underscores that Jekyll would filter out silently.
