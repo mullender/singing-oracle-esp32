@@ -38,15 +38,16 @@ python3 -m http.server 8765
 
 Then open `http://localhost:8765/installer/`.
 
-The installer needs the ESP Web Tools bundle at
-`installer/vendor/esp-web-tools/dist/web/install-button.js`. That file is
-built from the submodule; it is not checked in. Build it once before serving
-locally:
+The installer loads `./vendor/dist/install-button.js`. That file is not
+checked in — the deploy workflow builds it. For local serving, build the
+vendored fork once and copy the output into `installer/vendor/dist/`:
 
 ```sh
 cd installer/vendor/esp-web-tools
 npm ci
-npm run build
+bash script/build
+mkdir -p ../dist
+cp -r dist/web/. ../dist/
 ```
 
 ## Vendored dependencies
