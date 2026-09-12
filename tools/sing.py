@@ -101,6 +101,11 @@ def generate_melody(text: str, seed: int | None = None) -> list[tuple[int, int]]
 def play(port: str, notes: list[tuple[int, int]], program: int = CHOIR_AAHS, velocity: int = 100) -> None:
     """Send program change + note-on/note-off sequence over MIDI-over-USB."""
     with serial.Serial(port, 115200, timeout=1) as s:
+        # ESP32-S3 native USB CDC does not use DTR/RTS for reset, but some
+        # drivers pulse them on open — hold them low so the chip does not glitch.
+        s.dtr = False
+        s.rts = False
+        time.sleep(0.1)  # let the CDC endpoint settle before writing
         s.write(bytes([0xC0, program]))
         time.sleep(0.05)
         for note, dur_ms in notes:
