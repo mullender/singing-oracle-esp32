@@ -10,7 +10,6 @@ Usage:
 """
 
 import argparse
-import glob
 import hashlib
 import random
 import sys
@@ -18,6 +17,7 @@ import time
 
 try:
     import serial
+    from serial.tools import list_ports
 except ImportError:
     sys.exit("pyserial required: pip install pyserial")
 
@@ -26,14 +26,24 @@ C_MAJOR = [60, 62, 64, 65, 67, 69, 71, 72]
 
 CHOIR_AAHS = 0x34  # GM patch 53, 0-indexed
 
+# Espressif USB-JTAG/serial device on the AtomS3 (S3 native USB CDC).
+ATOMS3_VID = 0x303A
+ATOMS3_PID = 0x1001
+
 
 def find_port() -> str:
-    matches = sorted(glob.glob("/dev/tty.usbmodem*") + glob.glob("/dev/ttyACM*"))
-    if not matches:
-        sys.exit("no /dev/tty.usbmodem* or /dev/ttyACM* found — is the AtomS3 plugged in?")
-    if len(matches) > 1:
-        print(f"multiple ports found; using {matches[0]}", file=sys.stderr)
-    return matches[0]
+    ports = list(list_ports.comports())
+    atoms3 = [p.device for p in ports if p.vid == ATOMS3_VID and p.pid == ATOMS3_PID]
+    if atoms3:
+        if len(atoms3) > 1:
+            print(f"multiple AtomS3 ports found; using {atoms3[0]}", file=sys.stderr)
+        return atoms3[0]
+    if not ports:
+        sys.exit("no serial ports found — is the AtomS3 plugged in?")
+    listing = "\n  ".join(f"{p.device}  VID:PID={p.vid:04X}:{p.pid:04X}  {p.description}"
+                          for p in ports if p.vid is not None)
+    sys.exit(f"no AtomS3 (VID:PID={ATOMS3_VID:04X}:{ATOMS3_PID:04X}) found. "
+             f"Ports seen:\n  {listing}\nUse --port to override.")
 
 
 def syllable_count(word: str) -> int:
